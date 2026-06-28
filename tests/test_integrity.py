@@ -1,7 +1,7 @@
 """Integrity: fast-pass detection is conservative and only flags passes."""
 
-from quizforge import assess_speed, expected_min_seconds
-from quizforge.integrity import DEFAULT_MIN_SECONDS_PER_TYPE
+from quizforge import assess_speed, expected_min_seconds, within_time_limit
+from quizforge.integrity import DEFAULT_MIN_SECONDS_PER_TYPE, DEFAULT_TIME_LIMIT_SECONDS
 
 # A representative 20-question test (the default blueprint shape).
 TEST_TYPES = ["mc"] * 8 + ["fill_blank"] * 4 + ["match"] * 2 + ["short"] * 4 + ["freetext"] * 2
@@ -51,3 +51,23 @@ def test_thresholds_are_tunable():
     flag = assess_speed(elapsed_seconds=int(expected * 0.9), question_types=TEST_TYPES,
                         passed=True, low_ratio=1.0, high_ratio=0.25)
     assert flag.severity == "low"
+
+
+def test_within_time_limit_default_is_30_minutes():
+    assert DEFAULT_TIME_LIMIT_SECONDS == 1800
+    assert within_time_limit(1799) is True
+    assert within_time_limit(1800) is True          # exactly at the budget is OK
+    assert within_time_limit(1801) is False         # one second over
+
+
+def test_within_time_limit_untimed_and_no_limit_pass():
+    # Legacy / untimed attempts are not violations, and a non-positive limit
+    # means "no limit" and always passes.
+    assert within_time_limit(0) is True
+    assert within_time_limit(-5) is True
+    assert within_time_limit(99999, limit_seconds=0) is True
+
+
+def test_within_time_limit_custom_budget():
+    assert within_time_limit(120, limit_seconds=300) is True
+    assert within_time_limit(600, limit_seconds=300) is False

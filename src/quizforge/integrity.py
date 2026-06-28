@@ -30,6 +30,25 @@ DEFAULT_MIN_SECONDS_PER_TYPE = {
 # Seconds assumed for a format not in the table (unknown / custom).
 DEFAULT_FALLBACK_SECONDS = 6.0
 
+# Default wall-clock budget for a single timed attempt (30 minutes). A limit is
+# the opposite end of the timing spectrum from :func:`assess_speed`: too *slow*
+# rather than too *fast*. Enforcement (a countdown that auto-submits) is the
+# caller's UI concern; this module just owns the policy value and the check.
+DEFAULT_TIME_LIMIT_SECONDS = 1800
+
+
+def within_time_limit(elapsed_seconds: int,
+                      limit_seconds: int = DEFAULT_TIME_LIMIT_SECONDS) -> bool:
+    """Whether a timed attempt finished inside its allotted budget.
+
+    Untimed attempts (``elapsed_seconds <= 0``, e.g. legacy rows or a disabled
+    timer) are treated as within limit — absence of timing is not a violation.
+    A non-positive ``limit_seconds`` means "no limit" and always returns True.
+    """
+    if elapsed_seconds <= 0 or limit_seconds <= 0:
+        return True
+    return elapsed_seconds <= limit_seconds
+
 
 class IntegrityFlag(BaseModel):
     """The verdict on a single attempt's timing."""

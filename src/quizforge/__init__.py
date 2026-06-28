@@ -18,6 +18,7 @@ Grade:
 Integrity:
     assess_speed(*, elapsed_seconds, question_types, passed) -> IntegrityFlag
     expected_min_seconds(question_types) -> float
+    within_time_limit(elapsed_seconds, limit_seconds=...) -> bool
     IntegrityFlag
 Certificate:
     make_certificate(*, learner_id, ..., score_pct, awarded_on) -> Certificate
@@ -53,9 +54,11 @@ from .grade import (
 )
 from .integrity import (
     DEFAULT_MIN_SECONDS_PER_TYPE,
+    DEFAULT_TIME_LIMIT_SECONDS,
     IntegrityFlag,
     assess_speed,
     expected_min_seconds,
+    within_time_limit,
 )
 from .llm import structured_output
 from .sample import DEFAULT_BLUEPRINT, DIFFICULTY_ORDER, pick_spread, sample_test
@@ -75,8 +78,10 @@ __all__ = [
     "QuizGrade",
     "assess_speed",
     "expected_min_seconds",
+    "within_time_limit",
     "IntegrityFlag",
     "DEFAULT_MIN_SECONDS_PER_TYPE",
+    "DEFAULT_TIME_LIMIT_SECONDS",
     "Certificate",
     "make_certificate",
     "verification_code",
