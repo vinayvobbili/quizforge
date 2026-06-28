@@ -19,12 +19,24 @@ Integrity:
     assess_speed(*, elapsed_seconds, question_types, passed) -> IntegrityFlag
     expected_min_seconds(question_types) -> float
     IntegrityFlag
+Certificate:
+    make_certificate(*, learner_id, ..., score_pct, awarded_on) -> Certificate
+    verification_code(...) -> str   |   verify(certificate) -> bool
+    Certificate
 Utilities:
     normalize(text) -> str
     structured_output(llm, schema) -> chain
 """
 
 from .bank import Bank
+from .certificate import (
+    Certificate,
+    is_eligible,
+    level_for,
+    make_certificate,
+    verification_code,
+    verify,
+)
 from .generate import (
     DEFAULT_COVERAGE,
     DEFAULT_DIFF_SPLIT,
@@ -65,6 +77,12 @@ __all__ = [
     "expected_min_seconds",
     "IntegrityFlag",
     "DEFAULT_MIN_SECONDS_PER_TYPE",
+    "Certificate",
+    "make_certificate",
+    "verification_code",
+    "verify",
+    "is_eligible",
+    "level_for",
     "normalize",
     "structured_output",
     "DEFAULT_BLUEPRINT",
