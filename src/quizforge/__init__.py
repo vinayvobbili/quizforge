@@ -15,6 +15,10 @@ Grade:
     grade_match(question, selections) -> dict
     grade_open_answer(question, user_answer, llm) -> QuizGrade | None
     QuizGrade
+Integrity:
+    assess_speed(*, elapsed_seconds, question_types, passed) -> IntegrityFlag
+    expected_min_seconds(question_types) -> float
+    IntegrityFlag
 Utilities:
     normalize(text) -> str
     structured_output(llm, schema) -> chain
@@ -35,6 +39,12 @@ from .grade import (
     grade_match,
     grade_open_answer,
 )
+from .integrity import (
+    DEFAULT_MIN_SECONDS_PER_TYPE,
+    IntegrityFlag,
+    assess_speed,
+    expected_min_seconds,
+)
 from .llm import structured_output
 from .sample import DEFAULT_BLUEPRINT, DIFFICULTY_ORDER, pick_spread, sample_test
 from .schemas import DIFFICULTIES, FORMAT_KEYS, FORMATS
@@ -51,6 +61,10 @@ __all__ = [
     "grade_match",
     "grade_open_answer",
     "QuizGrade",
+    "assess_speed",
+    "expected_min_seconds",
+    "IntegrityFlag",
+    "DEFAULT_MIN_SECONDS_PER_TYPE",
     "normalize",
     "structured_output",
     "DEFAULT_BLUEPRINT",
