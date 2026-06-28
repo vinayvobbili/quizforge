@@ -20,6 +20,7 @@ Utilities:
     structured_output(llm, schema) -> chain
 """
 
+from .bank import Bank
 from .generate import (
     DEFAULT_COVERAGE,
     DEFAULT_DIFF_SPLIT,
@@ -42,6 +43,7 @@ from .text import normalize
 __version__ = "0.1.0"
 
 __all__ = [
+    "Bank",
     "generate_bank",
     "sample_test",
     "pick_spread",

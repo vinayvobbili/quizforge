@@ -68,3 +68,8 @@ def bank_responder(per_call: int = 8):
         return schema(questions=items)
 
     return _respond
+
+
+def make_fake_llm():
+    """Zero-arg factory for the CLI's --llm dotted-path resolution in tests."""
+    return FakeLLM(bank_responder())
