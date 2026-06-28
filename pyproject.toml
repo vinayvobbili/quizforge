@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "quizforge"
-version = "0.1.0"
+version = "0.2.0"
 description = "Generate a deep, mixed-format question bank from source material and grade it — deterministic where it can, LLM where it must. Bring your own chat model."
 readme = "README.md"
 requires-python = ">=3.10"
