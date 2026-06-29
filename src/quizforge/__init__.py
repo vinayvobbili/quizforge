@@ -67,7 +67,7 @@ from .sample import DEFAULT_BLUEPRINT, DIFFICULTY_ORDER, pick_spread, sample_tes
 from .schemas import DIFFICULTIES, FORMAT_KEYS, FORMATS
 from .text import edit_distance, is_typo_match, normalize
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 __all__ = [
     "Bank",
