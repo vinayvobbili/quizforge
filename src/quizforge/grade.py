@@ -12,20 +12,36 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 from .llm import structured_output
-from .text import normalize
+from .text import is_typo_match, normalize
 
 logger = logging.getLogger("quizforge")
+
+# Points a question is worth by difficulty, so harder questions count for more
+# than the trivial recall ones. A test's score is the sum of earned points over
+# the sum of available points, so percentages (and pass thresholds) still work.
+DIFFICULTY_WEIGHTS = {"easy": 1, "medium": 2, "hard": 3}
+
+
+def difficulty_weight(question: dict, default: str = "medium") -> int:
+    """Point value for ``question`` based on its ``difficulty`` (defaults medium=2)."""
+    d = question.get("difficulty") or default
+    return DIFFICULTY_WEIGHTS.get(d, DIFFICULTY_WEIGHTS[default])
 
 
 def grade_fill_blank(question: dict, user_answer: str) -> dict:
     """Deterministic grade for a fill-in-the-blank against accepted_answers.
 
-    Binary credit: 1.0 if the normalized answer matches any accepted answer.
+    Binary credit: 1.0 if the normalized answer matches any accepted answer
+    exactly, or is within a small typo of one (so 'priviliges' still earns credit
+    for 'privileges'). The ``fuzzy`` flag reports when a typo was forgiven.
     """
     accepted = question.get("accepted_answers") or []
     ua = normalize(user_answer)
-    correct = bool(ua) and ua in {normalize(a) for a in accepted}
-    return {"score": 1.0 if correct else 0.0, "correct": correct, "accepted": accepted}
+    exact = bool(ua) and ua in {normalize(a) for a in accepted}
+    fuzzy = bool(ua) and not exact and any(is_typo_match(ua, a) for a in accepted)
+    correct = exact or fuzzy
+    return {"score": 1.0 if correct else 0.0, "correct": correct,
+            "accepted": accepted, "fuzzy": fuzzy}
 
 
 def grade_match(question: dict, selections: dict) -> dict:

@@ -47,7 +47,9 @@ from .generate import (
 )
 from .grade import (
     DEFAULT_GRADE_SYSTEM,
+    DIFFICULTY_WEIGHTS,
     QuizGrade,
+    difficulty_weight,
     grade_fill_blank,
     grade_match,
     grade_open_answer,
@@ -63,7 +65,7 @@ from .integrity import (
 from .llm import structured_output
 from .sample import DEFAULT_BLUEPRINT, DIFFICULTY_ORDER, pick_spread, sample_test
 from .schemas import DIFFICULTIES, FORMAT_KEYS, FORMATS
-from .text import normalize
+from .text import edit_distance, is_typo_match, normalize
 
 __version__ = "0.2.0"
 
@@ -75,6 +77,8 @@ __all__ = [
     "grade_fill_blank",
     "grade_match",
     "grade_open_answer",
+    "difficulty_weight",
+    "DIFFICULTY_WEIGHTS",
     "QuizGrade",
     "assess_speed",
     "expected_min_seconds",
@@ -89,6 +93,8 @@ __all__ = [
     "is_eligible",
     "level_for",
     "normalize",
+    "is_typo_match",
+    "edit_distance",
     "structured_output",
     "DEFAULT_BLUEPRINT",
     "DEFAULT_TARGETS",

@@ -4,11 +4,21 @@ import pytest
 
 from quizforge import (
     QuizGrade,
+    difficulty_weight,
     grade_fill_blank,
     grade_match,
     grade_open_answer,
     normalize,
 )
+
+
+def test_difficulty_weight_scales_and_defaults():
+    assert difficulty_weight({"difficulty": "easy"}) == 1
+    assert difficulty_weight({"difficulty": "medium"}) == 2
+    assert difficulty_weight({"difficulty": "hard"}) == 3
+    # missing / unknown difficulty falls back to medium (2)
+    assert difficulty_weight({}) == 2
+    assert difficulty_weight({"difficulty": "spicy"}) == 2
 from fakes import FakeLLM
 
 
@@ -30,6 +40,32 @@ def test_fill_blank_accepts_synonyms_and_is_case_insensitive():
 def test_fill_blank_empty_answer_is_wrong():
     q = {"accepted_answers": ["x"]}
     assert grade_fill_blank(q, "")["score"] == 0.0
+
+
+def test_fill_blank_forgives_single_typo():
+    q = {"accepted_answers": ["privileges", "rights", "permissions", "access"]}
+    res = grade_fill_blank(q, "priviliges")  # the real-world miss
+    assert res["correct"] is True and res["score"] == 1.0
+    assert res["fuzzy"] is True
+    # an exact match is not flagged fuzzy
+    exact = grade_fill_blank(q, "Privileges")
+    assert exact["correct"] is True and exact["fuzzy"] is False
+
+
+def test_fill_blank_typo_tolerance_scales_with_length():
+    q = {"accepted_answers": ["authentication"]}
+    assert grade_fill_blank(q, "authentcation")["correct"] is True   # 1 missing char
+    assert grade_fill_blank(q, "authentiction")["correct"] is True   # 2 edits, len>=8
+
+
+def test_fill_blank_does_not_overaccept_wrong_words():
+    # 'permissions' vs a genuinely different answer should stay wrong
+    q = {"accepted_answers": ["privileges", "rights", "permissions", "access"]}
+    assert grade_fill_blank(q, "passwords")["correct"] is False
+    # short answers must match exactly — no fuzzing 'PA' into 'PB'
+    short = {"accepted_answers": ["PA", "the firewall"]}
+    assert grade_fill_blank(short, "pb")["correct"] is False
+    assert grade_fill_blank(short, "PA")["correct"] is True
 
 
 def test_match_partial_credit_and_rows():
